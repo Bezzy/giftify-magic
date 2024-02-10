@@ -1,0 +1,592 @@
+<!doctype html>
+<html style="font-size: 1.25rem;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mtgsdk@1.0.1/src/index.min.js"></script>
+
+  <style type="text/tailwindcss">
+    @font-face {
+        font-family: "gwent";
+        src: url("./assets/fonts/hinted-GWENT-ExtraBold.woff") format("woff");
+    }
+
+    @font-face {
+        font-family: "HalisGR-BOOK";
+        src: url(./assets/fonts/hinted-HalisGR-Book.woff2);
+    }
+
+    .new_deck {
+        -webkit-text-size-adjust: 100%;
+        font-size: 1.25rem;
+        font-weight: 400;
+        -webkit-font-smoothing: antialiased;
+        font-family: HalisGR-Book,sans-serif;
+        box-sizing: inherit;
+        background-color: transparent;
+        line-height: inherit;
+        transition: color .2s ease-in-out;
+        text-decoration: none;
+        display: flex;
+        flex-direction: row;
+        -webkit-box-pack: start;
+        justify-content: flex-start;
+        -webkit-box-align: center;
+        align-items: center;
+        position: relative;
+        width: 100%;
+        height: 3rem;
+        cursor: pointer;
+        margin-left: 4px;
+        margin-top: 8px;
+        text-align: center;
+        color: white;
+        outline: none;
+        width: 300px;
+    }
+
+    .new_deck::after {
+        content: "";
+        position: absolute;
+        top: -1px;
+        left: 0px;
+        width: calc(100% + 1px);
+        height: 60px;
+        border-width: 8px 4px;
+        border-top-width: 8px;
+        border-right-width: 4px;
+        border-bottom-width: 8px;
+        border-left-width: 4px;
+        border-style: solid;
+        border-image-slice: 8 4 fill;
+        border-image-outset: 0;
+        border-image-repeat: round;
+        border-image-source: url(./assets/leader-frame.png);
+    }
+
+
+    .iWBLwG {
+        -webkit-text-size-adjust: 100%;
+        font-size: 1.25rem;
+        font-weight: 400;
+        -webkit-font-smoothing: antialiased;
+        font-family: HalisGR-Book,sans-serif;
+        line-height: inherit;
+        cursor: pointer;
+        text-align: center;
+        color: white;
+        box-sizing: inherit;
+        margin: 0;
+        padding: 0;
+        position: relative;
+        display: flex;
+        -webkit-box-align: center;
+        align-items: center;
+        -webkit-box-pack: center;
+        justify-content: center;
+        content: "";
+        width: 2rem;
+        height: 2rem;
+        margin-left: 1rem;
+    }
+
+    .iWBLwG::before {
+        position: absolute;
+        content: "";
+        width: 1rem;
+        height: 0.25rem;
+        background-color: rgb(186, 136, 72);
+    }
+
+    .iWBLwG::after {
+        position: absolute;
+        content: "";
+        width: 0.25rem;
+        height: 1.125rem;
+        background-color: rgb(186, 136, 72);
+    }
+
+    .daTZGN {
+        content: "";
+        width: 1.5rem;
+        height: 1.5rem;
+        border: 2px solid rgb(119, 98, 77);
+        transform: rotate(45deg);
+    }
+
+    .crfApt {
+        font-family: Gwent;
+        font-size: 1.5rem;
+        max-height: 2rem;
+        margin: 0px 0px 0.5rem 0.75rem;
+    }
+
+
+
+    /*
+    * Search Deck
+    */
+
+    .crdnLx {
+        display: flex;
+        -webkit-box-align: center;
+        align-items: center;
+        -webkit-box-pack: end;
+        justify-content: flex-end;
+        flex-direction: row;
+        position: relative;
+        margin: 1.5rem 0px 1.5rem;
+        width: calc(16px + 25rem);
+    }
+
+    .eTHfbE {
+        position: relative;
+        display: flex;
+        place-content: center flex-end;
+        -webkit-box-pack: end;
+        flex: 1 1 auto;
+    }
+
+    .nNDKL {
+        color: rgb(255, 255, 255);
+        background-color: rgba(0, 0, 0, 0.71);
+        font-size: 24px;
+        display: flex;
+        outline: none;
+        width: 100%;
+        height: 2.5rem;
+        margin-right: 2rem;
+        padding-left: 3rem;
+        position: relative;
+        font-family: HalisGR-Light, sans-serif;
+        border-width: 1px;
+        border-style: solid;
+        border-image: linear-gradient(to left, rgba(228, 170, 66, 0.1) 0%, rgba(249, 222, 121, 0.1) 100%) 1 / 1 / 0 stretch;
+    }
+
+    .nNDKL:focus {
+        border-image: linear-gradient(to left, rgb(228, 170, 66) 0%, rgb(249, 222, 121) 100%) 1 / 1 / 0 stretch;
+    }
+
+    .juInEb {
+        position: absolute;
+        display: flex;
+        -webkit-box-align: center;
+        align-items: center;
+        background-image: url(./assets/search.png);
+        background-position: center center;
+        background-repeat: no-repeat;
+        width: 3rem;
+        height: 3.25rem;
+        top: -5px;
+        left: 5px;
+    }
+
+    .dDCAKo {
+        display: flex;
+        flex-direction: column;
+        -webkit-box-pack: end;
+        justify-content: flex-end;
+        -webkit-box-align: center;
+        align-items: center;
+        width: 100%;
+        position: relative;
+        background-image: url(./assets/separator.png);
+        background-size: 97% 7%;
+        background-repeat: no-repeat;
+        background-position: center bottom;
+    }
+
+
+    /*
+    * End Search Deck
+    */
+
+    /*
+    * Cards List
+    */
+
+    .eghlJM {
+        position: relative;
+        width: 100%;
+        flex: 1 1 auto;
+        height: 100%;
+        padding: 1rem 1rem 1.5rem;
+    }
+
+    .dRPWMU {
+        position: absolute;
+        top: 0px;
+        left: 8px;
+        height: 3rem;
+        background-image: linear-gradient(rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 100%);
+        background-position: center center;
+        width: calc(100% - 16px);
+        z-index: 2;
+    }
+
+    .eyfScn {
+        display: flex;
+        flex-flow: wrap;
+        align-items: flex-start;
+        justify-content: space-around;
+        gap: 1rem 0.75rem;
+        margin-left: 0.7rem;
+        margin-bottom: 8rem;
+        margin-top: 1.5rem;
+    }
+
+    .kysPoZ {
+        display: flex;
+        width: 7.5rem;
+        height: 11.25rem;
+        top: 0px;
+        right: 0px;
+        position: relative;
+        border-radius: 6px;
+        overflow: hidden;
+        box-shadow: rgba(0, 0, 0, 0.8) 3px 4px 4px 2px;
+    }
+
+    .kysPoZ::before {
+        background-image: url(./assets/Image.jpeg), linear-gradient(rgba(157, 135, 104, 0.3) 0%, rgba(61, 44, 26, 0.3) 100%), url(./assets/card-tooltip.jpg);
+        background-position: center top, center center, center center;
+        background-repeat: no-repeat, no-repeat, repeat;
+        background-size: 110%;
+        content: "";
+        display: block;
+        filter: grayscale(0);
+        position: absolute;
+        left: 0px;
+        top: 0px;
+        width: 100%;
+        height: 100%;
+    }
+
+    .kysPoZ::after {
+        content: "";
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        right: 0px;
+        bottom: 0px;
+        width: calc(100% - 4px);
+        height: calc(100% - 2px);
+        z-index: 3;
+        visibility: hidden;
+        opacity: 0;
+        margin: auto;
+        border-style: solid;
+        border-image: none 100% / 1 / 0 stretch;
+        border-width: 2px;
+        border-color: rgb(17, 255, 184);
+        border-radius: 4px;
+        transition: opacity 0.2s ease-in-out 0s;
+    }
+
+    .hQMrnY {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 100%;
+        height: 100%;
+        background-image: url(./assets/frame-basis-gold.png);
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center top;
+    }
+
+    .jDzMSB {
+        width: 7.5rem;
+    }
+
+    /*
+    * Scroll bar
+    */
+
+
+    /************************
+    * Component Deck_Button *
+    ************************/
+
+    .deckBtn {
+        display: flex;
+        flex-flow: row;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 100%;
+        outline: none;
+        list-style: none;
+    }
+
+    .deckBtn_slot {
+        display: flex;
+        flex-flow: wrap;
+        -webkit-box-align: center;
+        align-items: center;
+        -webkit-box-pack: start;
+        justify-content: flex-start;
+        flex: 0 0 100%;
+        max-width: 400px;
+        height: 3.125rem;
+        padding: 0px 0px 0px 0.625rem;
+        position: relative;
+        background-size: auto 100%, auto 100%, auto, contain;
+        background-repeat: no-repeat, no-repeat, repeat, repeat;
+        outline: none;
+        margin-top: 0px;
+        margin-bottom: 10px;
+        background-image: url(./assets/mask.png), url(./assets/mon-background-right.png), linear-gradient(to left, rgba(157, 135, 104, 0.3) 0%, rgba(61, 44, 26, 0.3) 100%), url(./assets/card-tooltip.jpg);
+        background-position: 100% center, 96% center, center center, center center;
+    }
+
+    .deckBtn_slot::before {
+        content: "";
+        position: absolute;
+        top: -1px;
+        left: 0px;
+        width: calc(100% + 1px);
+        height: calc(100% + 1px);
+        border-width: 8px 4px;
+        border-style: solid;
+        border-image-slice: 8 4 fill;
+        border-image-outset: 0;
+        border-image-repeat: round;
+        border-image-source: url(./assets/leader-frame.png);
+    }
+
+    .deckBtn_slot::after {
+        content: "";
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        right: 0px;
+        bottom: 0px;
+        width: calc(100% - 4px);
+        height: calc(100% - 2px);
+        box-shadow: rgb(17, 255, 184) 0px 0px 15px, rgb(17, 255, 184) 0px 0px 20px inset, rgba(0, 255, 179, 0.5) 0px 0px 0px 1px inset;
+        z-index: 3;
+        visibility: hidden;
+        opacity: 0;
+        margin: auto;
+        border-style: solid;
+        border-image: none 100% / 1 / 0 stretch;
+        border-width: 2px;
+        border-color: rgb(17, 255, 184);
+        border-radius: 4px;
+        transition: opacity 0.2s ease-in-out 0s;
+    }
+
+    .deckBtn_name {
+        -webkit-box-align: center;
+        align-items: center;
+        color: rgb(255, 255, 255);
+        display: block;
+        font-family: gwent, sans-serif;
+        font-size: 18px;
+        font-weight: 800;
+        margin-left: 2.625rem;
+        overflow: hidden;
+        padding-left: 8px;
+        pointer-events: none;
+        text-overflow: ellipsis;
+        text-shadow: rgba(0, 0, 0, 0.7) 0px 1px 6px;
+        white-space: pre;
+    }
+
+    /******************************
+    * Component: Deck_Editing_Bar *
+    ******************************/
+
+    /********************************
+    * Component: Deck_Cards_Listing *
+    *********************************/
+
+    .deckCardsListing {
+        display: flex;
+        flex: 1 0 100%;
+        max-width: 400px;
+        align-items: flex-start;
+        -webkit-box-pack: start;
+        justify-content: flex-start;
+        flex-flow: wrap;
+        position: relative;
+        margin-left: 0px;
+        margin-bottom: 0px;
+        margin-top: 1rem;
+        padding: 0px 0px 1.25rem;
+    }
+
+    /********************************
+    * Component: Card_Container     *
+    *********************************/
+
+    .cardContainer {
+        display: flex;
+        flex-flow: row;
+        -webkit-box-align: center;
+        align-items: center;
+        -webkit-box-pack: center;
+        justify-content: center;
+        flex: 0 0 100%;
+        outline: none;
+    }
+
+    .cardContainer_slot {
+        display: flex;
+        flex-flow: wrap;
+        -webkit-box-align: center;
+        align-items: center;
+        -webkit-box-pack: start;
+        justify-content: flex-start;
+        flex: 0 0 100%;
+        max-width: 400px;
+        height: 2.1875rem;
+        padding: 0px 0px 0px 0.625rem;
+        position: relative;
+        background-image: url(./assets/mask.png), url(./assets/mon-background-right.png), linear-gradient(to left, rgba(157, 135, 104, 0.3) 0%, rgba(61, 44, 26, 0.3) 100%), url(./assets/card-tooltip.jpg);
+        background-size: auto 100%, auto 100%, auto, contain;
+        background-position: left center, 94% center, center center, center center;
+        background-repeat: no-repeat, no-repeat, repeat, repeat;
+        margin-bottom: 0px;
+        outline: none;
+    }
+
+    .cardContainer_slot::before {
+        content: "";
+        position: absolute;
+        top: -1px;
+        left: 0px;
+        width: calc(100% + 1px);
+        height: calc(100% + 1px);
+        border-width: 5px 8px;
+        border-style: solid;
+        border-image-slice: 5 8 fill;
+        border-image-outset: 0;
+        border-image-repeat: round;
+        border-image-source: url(./assets/golden-frame.png);
+    }
+
+    .cardContainer_slot::after {
+        content: "";
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        right: 0px;
+        bottom: 0px;
+        width: calc(100% - 4px);
+        height: calc(100% - 2px);
+        box-shadow: rgb(17, 255, 184) 0px 0px 15px, rgb(17, 255, 184) 0px 0px 20px inset, rgba(0, 255, 179, 0.5) 0px 0px 0px 1px inset;
+        z-index: 3;
+        visibility: hidden;
+        opacity: 0;
+        margin: auto;
+        border-style: solid;
+        border-image: none 100% / 1 / 0 stretch;
+        border-width: 2px;
+        border-color: rgb(17, 255, 184);
+        border-radius: 4px;
+        transition: opacity 0.2s ease-in-out 0s;
+    }
+
+    .cardContainer_name {
+        -webkit-box-align: center;
+        align-items: center;
+        font-size: 18px;
+        font-family: HalisGR, sans-serif;
+        color: rgb(255, 255, 255);
+        margin: -2px 5px 0px 0px;
+        text-shadow: rgba(0, 0, 0, 0.57) 0px 1px 3px;
+        z-index: 10;
+        pointer-events: none;
+        overflow-wrap: normal;
+        display: block;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        max-width: 200px;
+    }
+    .cardSelected {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 100%;
+        height: 100%;
+        background-color: rgb(17, 255, 184);
+        opacity: 0.3;
+        z-index: 1;
+    }
+
+    .cardSelected::after {
+        content: "";
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        right: 0px;
+        bottom: 0px;
+        width: calc(100% - 4px);
+        height: calc(100% - 2px);
+        box-shadow: rgb(17, 255, 184) 0px 0px 2.5rem 1.25rem inset;
+        z-index: 3;
+        visibility: visible;
+        opacity: 1;
+        margin: auto;
+        border-style: solid;
+        border-image: none 100% / 1 / 0 stretch;
+        border-width: 2px;
+        border-color: rgb(17, 255, 184);
+        border-radius: 4px;
+        transition: opacity 0.2s ease-in-out 0s;
+    }
+
+    /********************************
+    * Component: rollOptions        *
+    *********************************/
+
+    .rollOptions {
+        /*height: 0px;*/
+        flex-direction: column;
+        width: 100%;
+        transform-origin: center top;
+        display: block;
+    }
+
+    .rollOptions_btn {
+        width: 100%;
+        padding: 8px;
+        background-image: url(./assets/deck_option_button.png);
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        opacity: 1; pointer-events: none;
+    }
+
+</style>
+
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            gwent: ["gwent"],
+              HalisGR: ["HalisGR-BOOK"],
+          }
+        }
+      }
+    }
+  </script>
+
+</head>
+
+<body class="text-white text-[16px]" style="background-image: url('./assets/bg.jpg'), url('./assets/bg-seamless.jpg'); background-repeat: no-repeat, repeat; background-position: top, center 659px;">
+<audio id="paper-collect-1" src="./assets/paper-collect-1.mp3"></audio>
+    <main id="root" class="max-w-[1280px] mx-auto">
+
+    </main>
+    <script src="./index.js" type="text/babel"></script>
+</body>
+
+</html>
