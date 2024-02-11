@@ -1,4 +1,5 @@
-./idea
+.idea
 data/
 server/
 public/assets/*
+.gitignore
