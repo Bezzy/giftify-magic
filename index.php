@@ -49,22 +49,6 @@ $json_data = file_get_contents("php://input");
 
 $router = new AltoRouter();
 
-//$router->map('GET', '/', function () {
-//    $sqlite3 = new SQLite3(ABSPATH . "data/db.sqlite", SQLITE3_OPEN_READWRITE);
-//    $statement = $sqlite3->prepare("SELECT * FROM cards");
-//    $result = $statement->execute();
-//
-//    $cards_arr = [];
-//    while ($cards_row = $result->fetchArray(SQLITE3_ASSOC)) {
-//        array_push($cards_arr, $cards_row);
-//    }
-//
-//    $json_cards = json_encode($cards_arr);
-//
-//    header('Content-Type: application/json; charset=utf-8');
-//    echo $json_cards;
-//});
-
 $router->map('POST', '/api/create', function () {
     $json_data = file_get_contents("php://input");
     $data = json_decode($json_data, true);
@@ -83,6 +67,57 @@ $router->map('POST', '/api/create', function () {
 
     $deck_id = $deck_id[0];
     $deck_id = $deck_id["id"];
+
+    $cards = $data["cards"];
+
+    for ($idx = 0; $idx < count($cards); $idx++) {
+        $name = $cards[$idx]["name"];
+        $mana_cost = $cards[$idx]["manaCost"];
+        $cmc = $cards[$idx]["cmc"];
+        $type = $cards[$idx]["type"];
+        $text = $cards[$idx]["text"];
+        $power = $cards[$idx]["power"];
+        $toughness = $cards[$idx]["toughness"];
+        $imageUrl = $cards[$idx]["imageUrl"];
+        $id = $cards[$idx]["id"];
+        $flavor = $cards[$idx]["flavor"];
+
+        $statement = $sqlite3->prepare("INSERT INTO cards (name, manaCost, cmc, type, text, power, toughness, imageUrl, id, deck_id) VALUES (:name, :manaCost, :cmc, :type, :text, :power, :toughness, :imageUrl, :id, :deck_id)");
+        $statement->bindParam(":name", $name, SQLITE3_TEXT);
+        $statement->bindParam(":manaCost", $mana_cost, SQLITE3_TEXT);
+        $statement->bindParam(":cms", $cms, SQLITE3_TEXT);
+        $statement->bindParam(":type", $type, SQLITE3_TEXT);
+        $statement->bindParam(":text", $text, SQLITE3_TEXT);
+        $statement->bindParam(":power", $power, SQLITE3_TEXT);
+        $statement->bindParam(":toughness", $toughness, SQLITE3_TEXT);
+        $statement->bindParam(":imageUrl", $imageUrl, SQLITE3_TEXT);
+        $statement->bindParam(":id", $id, SQLITE3_TEXT);
+        $statement->bindParam(":deck_id", $deck_id, SQLITE3_TEXT);
+        $result = $statement->execute();
+    }
+
+
+
+    echo "Success";
+});
+
+$router->map('POST', '/api/update_deck', function () {
+    $json_data = file_get_contents("php://input");
+    $data = json_decode($json_data, true);
+    $sqlite3 = new SQLite3(ABSPATH . "data/db.sqlite", SQLITE3_OPEN_READWRITE);
+
+    $deck_id = $data["id"];
+    $statement = $sqlite3->prepare("DELETE FROM cards WHERE deck_id=:id");
+    $statement->bindParam(":id", $deck_id, SQLITE3_TEXT);
+    $statement->execute();
+
+
+    $deck_name = $data["name"];
+
+    $statement = $sqlite3->prepare("UPDATE Deck SET Name=:name WHERE id=:id");
+    $statement->bindParam(":name", $deck_name, SQLITE3_TEXT);
+    $statement->bindParam(":id", $deck_id, SQLITE3_TEXT);
+    $statement->execute();
 
     $cards = $data["cards"];
 
@@ -150,6 +185,8 @@ $router->map('GET', '/api/edit_deck', function () {
     header('Content-Type: application/json; charset=utf-8');
     echo $json_deck;
 });
+
+
 
 $match = $router->match();
 $match["target"]();

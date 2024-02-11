@@ -92,6 +92,9 @@ function App() {
   }
 
   function DeckStats() {
+
+      calculate_mana_avg();
+
     return (
         <div className="flex justify-evenly	w-full h-[5rem] relative pb-[0.5rem]">
           <div title="You need at least 25 cards in a deck." className="flex items-center justify-center">
@@ -107,7 +110,7 @@ function App() {
                 className="h-[2.1875rem] w-[1.875rem] relative bg-[url('./assets/scraps-icon.png')] bg-center bg-[length:auto_100%] bg-no-repeat before:content-[''] before:absolute before:bottom-[-1px] before:right-[-1px] before:w-[1.25rem] before:h-[1.375rem] before:bg-[length:100%_100%] before:bg-no-repeat before:bg-[url('./assets/validation-false.png')]"></div>
             <div className="flex flex-col items-center justify-center">
               <div className="text-white font-HalisGR text-[18px]">MAN AVG</div>
-              <div className="font-gwent text-[32px] leading-none">0</div>
+              <div className="font-gwent text-[32px] leading-none">{avg_cmc}</div>
             </div>
           </div>
         </div>
@@ -132,6 +135,15 @@ function App() {
     set_cards(clone_global_cards);
     set_roll_options_toggle(false);
     set_new_deck({name: "Nouveau Deck", cards: []});
+
+      fetch("http://127.0.0.1:9696/api/deck_list").
+      then(response => response.json()).
+      then(function (data) {
+          console.log("------------------------------------------------------------------------------------------------");
+          let clone_data = data.map(obj => ({ ...obj }));
+          let clone_deck_list = data.map(obj => ({ ...obj }));
+          set_deck_list(clone_deck_list);
+      });
 
     /*
     * TOOD(): Clean stuff.
@@ -185,8 +197,6 @@ function App() {
   }
 
   function Deck_Button() {
-    let deck_name;
-
     return (
         <li className="deckBtn" onClick={() => toggle_options()}>
           <div className="deckBtn_slot">
@@ -224,7 +234,7 @@ function App() {
       fetch("http://127.0.0.1:9696/api/edit_deck?id=" + deck.id).
       then(response => response.json()).
       then(function (data) {
-          set_new_deck({name:deck.Name, cards:data});
+          set_new_deck({name:deck.Name, cards:data, id:deck.id});
           let clone_cards = cards.map(obj => ({ ...obj }));
           let cards_selected = are_cards_selected(clone_cards, data);
           set_cards(cards_selected);
@@ -232,6 +242,7 @@ function App() {
   }
 
     function Deck_Button2(props) {
+      console.log("DEEDDEED", props.props.deck);
         return (
             <li className="deckBtn" onClick={() => update_mode(props.props.deck)}>
                 <div className="deckBtn_slot">
@@ -241,12 +252,40 @@ function App() {
         );
     }
 
+
+    const [avg_cmc, set_avg_cmc] = React.useState(0);
+
+    function calculate_mana_avg() {
+      let cards_without_land = new_deck.cards.filter(function(card) {
+          console.log("CARD calc", card);
+            if (!card.type.includes("Land")) {
+                return card;
+            }
+      });
+
+      console.log("cards_without_land", cards_without_land);
+
+      let total_cmc = 0;
+      for (let idx = 0; idx < cards_without_land.length; idx++) {
+          total_cmc += cards_without_land[idx].cmc;
+      }
+
+      console.log("total_cmc", total_cmc);
+
+      let avg_cmc = cards_without_land.length > 0 ? total_cmc / cards_without_land.length : 0;
+
+      avg_cmc = Math.round(avg_cmc*100) /100;
+
+      set_avg_cmc(avg_cmc);
+    }
+
   function add_card_to_deck(cards, card, idx_card) {
+      console.log("----------------dddddddddddd-------------", card);
       let clone_cards = cards.map(obj => ({ ...obj }));
 
 
       if ((editing_mode) === true) {
-          if (create_deck_mode === true) {
+          if ((create_deck_mode || is_update_mode) === true) {
               let can_add = true;
               new_deck.cards.map(((c, idx) => {
                   if (c.id === card.id) {
@@ -293,29 +332,49 @@ function App() {
 
 
   const [roll_options_toggle, set_roll_options_toggle] = React.useState(false);
+  const [deck_name, set_deck_name] = React.useState("");
+  let local_deck_name = ""
+  function save_deck_name(deck_name) {
+      console.log(local_deck_name)
+      let clone_new_deck = { ...new_deck };
+      clone_new_deck.name = deck_name;
+      set_new_deck(clone_new_deck);
+      // set_roll_options_toggle(false);
+  }
   function Roll_Options() {
+
+      let deck_name = ""
+
     return (
         <div className="rollOptions">
-          <button className="rollOptions_btn" >Changer le nom</button>
+            <button className="rollOptions_btn">Changer le nom</button>
+            <div className="eTHfbE">
+                <input onChange={(e) => deck_name = e.target.value} className="nNDKL"/>
+            </div>
+            <a onClick={() => save_deck_name(deck_name)} className="flex justify-center items-center min-w-[154px] px-[10px] border-y-[12px] border-x-[24px] border-solid opacity-100	text-center" style={{borderImageSource: "url('./assets/gold-button.png')", borderImageSlice: "12 24 fill", borderImageOutset: "0", borderImageRepeat: "stretch", filter: "drop-shadow(rgb(0, 0, 0) 0px 2px 4px)"}} href="#">
+                <p className="text-black font-gwent text-[20px]" >Ok</p>
+            </a>
         </div>
     );
   }
 
-  function Card_Container(name) {
-      console.log(name);
-    return (
-        <li className="cardContainer">
-          <div className="cardContainer_slot" tabIndex="0">
-            <div className="cardContainer_name">{name.name}</div>
-          </div>
-        </li>
-    );
-  }
+    function Card_Container(name) {
+        console.log(name);
+        return (
+            <li className="cardContainer">
+                <div className="cardContainer_slot" tabIndex="0">
+                    <div className="cardContainer_name">{name.name}</div>
+                </div>
+            </li>
+        );
+    }
 
-  function Deck_Editing_Bar() {
-    return (
-        <div style={{position: "relative", overflow: "hidden", width: "100%", height: "100%", margin: "0px"}}>
-          <div style={{position: "absolute", inset: "0px", overflow: "hidden scroll", marginRight: "-17px", marginBottom: "1rem"}}>
+    function Deck_Editing_Bar() {
+        return (
+            <div style={{position: "relative", overflow: "hidden", width: "100%", height: "100%", margin: "0px"}}>
+                <div style={{
+                    position: "absolute",
+                    inset: "0px", overflow: "hidden scroll", marginRight: "-17px", marginBottom: "1rem"}}>
             <div className="" style={{overflow: "hidden", marginRight: ""}}>
               <ul className="deckCardsListing">
                 <Deck_Button />
@@ -338,7 +397,15 @@ function App() {
   }
 
   function save_deck() {
-    post_save_deck("http://127.0.0.1:9696/api/create", new_deck);
+      console.log(new_deck);
+      if (create_deck_mode) {
+          post_save_deck("http://127.0.0.1:9696/api/create", new_deck);
+      }
+      if (is_update_mode) {
+          post_save_deck("http://127.0.0.1:9696/api/update_deck", new_deck);
+      }
+
+      discard_changes();
   }
 
   async function post_save_deck(url = "", data = {}) {
@@ -373,56 +440,6 @@ function App() {
 
               <div style={{position: "absolute", height: "6px", right: "2px", bottom: "2px", left: "2px", borderRadius: "3px"}}>
                   <div style={{position: "relative", display: "block", height: "100%", cursor: "pointer", borderRadius: "inherit", backgroundColor: "rgba(0, 0, 0, 0.2)", width: "0px"}}></div>
-              </div>
-          </div>
-      );
-  }
-
-  function Change_Deck_Name() {
-      return (
-          <div>
-              <div className="react-confirm-alert-overlay undefined">
-                  <div className="react-confirm-alert">
-                      <div style="display: flex; align-items: center;">
-                          <div className="ConfirmationStyles__ModalContent-sc-6g8z68-0 jJToJe"><p
-                              className="Gradient__GoldGradient-sc-11cfh66-0 ConfirmationStyles__ModalTitle-sc-6g8z68-3 kTEwCF">Modifier
-                              le nom</p>
-                              <div className="ConfirmationStyles__ModalTextBox-sc-6g8z68-1 jFShho">
-                                  <div className="ConfirmationStyles__ModalText-sc-6g8z68-4 bAhNKV"></div>
-                                  <div mobile="false"
-                                       style="position: relative; overflow: hidden; width: 100%; height: auto; min-height: 0px; max-height: 295px; max-width: 550px;">
-                                      <div
-                                          style="position: relative; overflow: scroll; margin-right: -17px; margin-bottom: -17px; min-height: 17px; max-height: 312px;">
-                                          <div className="DeckOptionsModal__RenameDeckContainer-sc-hid779-1 qAprr"><p
-                                              className="DeckOptionsModal__RenameDeckTitle-sc-hid779-3 dSNBmL">Nom du
-                                              jeu</p><input placeholder="Entrer un nom de jeu&nbsp;:"
-                                                            className="DeckOptionsModal__RenameDeckInput-sc-hid779-4 lezPGR"
-                                                            value=""/></div>
-                                      </div>
-                                      <div
-                                          style="position: absolute; height: 6px; right: 2px; bottom: 2px; left: 2px; border-radius: 3px; visibility: hidden;">
-                                          <div
-                                              style="position: relative; display: block; height: 100%; cursor: pointer; border-radius: inherit; background-color: rgba(0, 0, 0, 0.2); width: 0px;"></div>
-                                      </div>
-                                      <div className="ConfirmationStyles__TrackVertical-sc-6g8z68-12 hNBrsD"
-                                           style="position: absolute; width: 6px; visibility: hidden;">
-                                          <div className="ConfirmationStyles__ThumbVertical-sc-6g8z68-13 cDaIDz"
-                                               style="position: relative; display: block; width: 100%; height: 0px;"></div>
-                                      </div>
-                                  </div>
-                                  <div className="ConfirmationStyles__ScrollShadow-sc-6g8z68-14 beXcfu"></div>
-                              </div>
-                              <div className="ConfirmationStyles__Buttons-sc-6g8z68-8 koQjAG">
-                                  <button className="ConfirmationStyles__ButtonBase-sc-6g8z68-7 bZbUMA"><p
-                                      className="Gradient__GoldGradient-sc-11cfh66-0 ConfirmationStyles__ButtonTextGold-sc-6g8z68-10 eBoxnK">Annuler</p>
-                                  </button>
-                                  <button disabled="" className="ConfirmationStyles__ButtonBase-sc-6g8z68-7 MSqcr"><p
-                                      className="ConfirmationStyles__ButtonText-sc-6g8z68-9 gZgjlD">Sauvegarder</p>
-                                  </button>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
               </div>
           </div>
       );
