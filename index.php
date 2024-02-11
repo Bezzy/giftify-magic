@@ -85,14 +85,14 @@ $router->map('POST', '/api/create', function () {
         $statement = $sqlite3->prepare("INSERT INTO cards (name, manaCost, cmc, type, text, power, toughness, imageUrl, id, deck_id) VALUES (:name, :manaCost, :cmc, :type, :text, :power, :toughness, :imageUrl, :id, :deck_id)");
         $statement->bindParam(":name", $name, SQLITE3_TEXT);
         $statement->bindParam(":manaCost", $mana_cost, SQLITE3_TEXT);
-        $statement->bindParam(":cms", $cms, SQLITE3_TEXT);
+        $statement->bindParam(":cmc", $cmc, SQLITE3_TEXT);
         $statement->bindParam(":type", $type, SQLITE3_TEXT);
         $statement->bindParam(":text", $text, SQLITE3_TEXT);
-        $statement->bindParam(":power", $power, SQLITE3_TEXT);
-        $statement->bindParam(":toughness", $toughness, SQLITE3_TEXT);
+        $statement->bindParam(":power", $power, SQLITE3_INTEGER);
+        $statement->bindParam(":toughness", $toughness, SQLITE3_INTEGER);
         $statement->bindParam(":imageUrl", $imageUrl, SQLITE3_TEXT);
         $statement->bindParam(":id", $id, SQLITE3_TEXT);
-        $statement->bindParam(":deck_id", $deck_id, SQLITE3_TEXT);
+        $statement->bindParam(":deck_id", $deck_id, SQLITE3_INTEGER);
         $result = $statement->execute();
     }
 
@@ -136,7 +136,7 @@ $router->map('POST', '/api/update_deck', function () {
         $statement = $sqlite3->prepare("INSERT INTO cards (name, manaCost, cmc, type, text, power, toughness, imageUrl, id, deck_id) VALUES (:name, :manaCost, :cmc, :type, :text, :power, :toughness, :imageUrl, :id, :deck_id)");
         $statement->bindParam(":name", $name, SQLITE3_TEXT);
         $statement->bindParam(":manaCost", $mana_cost, SQLITE3_TEXT);
-        $statement->bindParam(":cms", $cms, SQLITE3_TEXT);
+        $statement->bindParam(":cmc", $cms, SQLITE3_TEXT);
         $statement->bindParam(":type", $type, SQLITE3_TEXT);
         $statement->bindParam(":text", $text, SQLITE3_TEXT);
         $statement->bindParam(":power", $power, SQLITE3_TEXT);

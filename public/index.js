@@ -1,3 +1,7 @@
+
+let audio = document.getElementById("paper-collect-1");
+audio.click();
+
 function App() {
   const [cards, set_cards] = React.useState([]);
   const [filtering_cards, set_filtering_cards] = React.useState([]);
@@ -42,6 +46,7 @@ function App() {
     let card = document.getElementById(id);
     let sound = document.getElementById("paper-collect-1");
     sound.currentTime = 0;
+    sound.muted = false;
     sound.play();
     card.style.transform = "scale(1.2)";
     card.style.zIndex = "99999";
@@ -91,18 +96,19 @@ function App() {
     );
   }
 
-  function DeckStats() {
+    function DeckStats() {
 
-      calculate_mana_avg();
+    calculate_mana_avg();
+    count_cards_deck();
 
-    return (
+      return (
         <div className="flex justify-evenly	w-full h-[5rem] relative pb-[0.5rem]">
           <div title="You need at least 25 cards in a deck." className="flex items-center justify-center">
             <div
                 className="h-[2.1875rem] w-[1.875rem] relative bg-[url('./assets/scraps-icon.png')] bg-center bg-[length:auto_100%] bg-no-repeat before:content-[''] before:absolute before:bottom-[-1px] before:right-[-1px] before:w-[1.25rem] before:h-[1.375rem] before:bg-[length:100%_100%] before:bg-no-repeat before:bg-[url('./assets/validation-false.png')]"></div>
             <div className="flex flex-col items-center justify-center">
-              <div className="text-white font-HalisGR text-[18px]">MIN</div>
-              <div className="font-gwent text-[32px] leading-none">25</div>
+              <div className="text-white font-HalisGR text-[18px]">CARTES</div>
+              <div className="font-gwent text-[32px] leading-none">{cards_number_deck}</div>
             </div>
           </div>
           <div title="You need at least 25 cards in a deck." className="flex items-center justify-center">
@@ -285,7 +291,7 @@ function App() {
 
 
       if ((editing_mode) === true) {
-          if ((create_deck_mode || is_update_mode) === true) {
+          if (((create_deck_mode || is_update_mode) === true)) {
               let can_add = true;
               new_deck.cards.map(((c, idx) => {
                   if (c.id === card.id) {
@@ -296,15 +302,18 @@ function App() {
 
                       clone_cards[idx_card].is_selected = false;
                       set_cards(clone_cards);
+
                   }
               }));
-              if (can_add === true) {
+              if (can_add === true && (cards_number_deck < 30)) {
                   let clone_new_deck = {...new_deck};
                   clone_new_deck.cards.push(card);
                   set_new_deck(clone_new_deck);
 
                   clone_cards[idx_card].is_selected = true;
                   set_cards(clone_cards);
+
+
               } else {
 
               }
@@ -498,7 +507,12 @@ function App() {
 
     const [search_val, set_search_val] = React.useState("");
 
+    const [cards_number_deck, set_cards_number_deck] = React.useState(0);
 
+    function count_cards_deck() {
+        let cards_number = new_deck.cards.length;
+        set_cards_number_deck(cards_number);
+    }
 
     return (
         <div>
