@@ -49,21 +49,21 @@ $json_data = file_get_contents("php://input");
 
 $router = new AltoRouter();
 
-$router->map('GET', '/', function () {
-    $sqlite3 = new SQLite3(ABSPATH . "data/db.sqlite", SQLITE3_OPEN_READWRITE);
-    $statement = $sqlite3->prepare("SELECT * FROM cards");
-    $result = $statement->execute();
-
-    $cards_arr = [];
-    while ($cards_row = $result->fetchArray(SQLITE3_ASSOC)) {
-        array_push($cards_arr, $cards_row);
-    }
-
-    $json_cards = json_encode($cards_arr);
-
-    header('Content-Type: application/json; charset=utf-8');
-    echo $json_cards;
-});
+//$router->map('GET', '/', function () {
+//    $sqlite3 = new SQLite3(ABSPATH . "data/db.sqlite", SQLITE3_OPEN_READWRITE);
+//    $statement = $sqlite3->prepare("SELECT * FROM cards");
+//    $result = $statement->execute();
+//
+//    $cards_arr = [];
+//    while ($cards_row = $result->fetchArray(SQLITE3_ASSOC)) {
+//        array_push($cards_arr, $cards_row);
+//    }
+//
+//    $json_cards = json_encode($cards_arr);
+//
+//    header('Content-Type: application/json; charset=utf-8');
+//    echo $json_cards;
+//});
 
 $router->map('POST', '/api/create', function () {
     $json_data = file_get_contents("php://input");
@@ -76,22 +76,39 @@ $router->map('POST', '/api/create', function () {
 
     $statement = $sqlite3->prepare("SELECT id FROM Deck ORDER BY id DESC LIMIT 1");
     $result = $statement->execute();
-    $row_id = [];
+    $deck_id = [];
     while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
-        array_push($row_id, $row);
+        array_push($deck_id, $row);
     }
 
-    $row_id = $row_id[0];
-    $row_id = $row_id["id"];
+    $deck_id = $deck_id[0];
+    $deck_id = $deck_id["id"];
 
     $cards = $data["cards"];
 
     for ($idx = 0; $idx < count($cards); $idx++) {
-        $card_id = $cards[$idx];
-        $card_id = $card_id["id"];
-        $statement = $sqlite3->prepare("INSERT INTO deck_composition (deck_id, card_id) VALUES (:deck_id, :card_id)");
-        $statement->bindParam(":deck_id", $row_id, SQLITE3_TEXT);
-        $statement->bindParam(":card_id", $card_id, SQLITE3_TEXT);
+        $name = $cards[$idx]["name"];
+        $mana_cost = $cards[$idx]["manaCost"];
+        $cmc = $cards[$idx]["cmc"];
+        $type = $cards[$idx]["type"];
+        $text = $cards[$idx]["text"];
+        $power = $cards[$idx]["power"];
+        $toughness = $cards[$idx]["toughness"];
+        $imageUrl = $cards[$idx]["imageUrl"];
+        $id = $cards[$idx]["id"];
+        $flavor = $cards[$idx]["flavor"];
+
+        $statement = $sqlite3->prepare("INSERT INTO cards (name, manaCost, cmc, type, text, power, toughness, imageUrl, id, deck_id) VALUES (:name, :manaCost, :cmc, :type, :text, :power, :toughness, :imageUrl, :id, :deck_id)");
+        $statement->bindParam(":name", $name, SQLITE3_TEXT);
+        $statement->bindParam(":manaCost", $mana_cost, SQLITE3_TEXT);
+        $statement->bindParam(":cms", $cms, SQLITE3_TEXT);
+        $statement->bindParam(":type", $type, SQLITE3_TEXT);
+        $statement->bindParam(":text", $text, SQLITE3_TEXT);
+        $statement->bindParam(":power", $power, SQLITE3_TEXT);
+        $statement->bindParam(":toughness", $toughness, SQLITE3_TEXT);
+        $statement->bindParam(":imageUrl", $imageUrl, SQLITE3_TEXT);
+        $statement->bindParam(":id", $id, SQLITE3_TEXT);
+        $statement->bindParam(":deck_id", $deck_id, SQLITE3_TEXT);
         $result = $statement->execute();
     }
 
@@ -119,7 +136,7 @@ $router->map('GET', '/api/deck_list', function () {
 $router->map('GET', '/api/edit_deck', function () {
     $id = $_GET["id"];
     $sqlite3 = new SQLite3(ABSPATH . "data/db.sqlite", SQLITE3_OPEN_READWRITE);
-    $statement = $sqlite3->prepare("SELECT * FROM  cards INNER JOIN deck_composition ON cards.id = deck_composition.card_id WHERE deck_composition.deck_id = :id");
+    $statement = $sqlite3->prepare("SELECT * FROM  cards WHERE cards.deck_id = :id");
     $statement->bindParam(":id", $id, SQLITE3_TEXT);
     $result = $statement->execute();
 

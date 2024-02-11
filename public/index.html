@@ -7,7 +7,6 @@
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mtgsdk@1.0.1/src/index.min.js"></script>
 
   <style type="text/tailwindcss">
     @font-face {
@@ -562,6 +561,46 @@
         background-repeat: no-repeat;
         background-size: 100% 100%;
         opacity: 1; pointer-events: none;
+    }
+
+    /************************
+    * Component Pagination  *
+    ************************/
+
+    .pagination {
+        display: flex;
+        flex-flow: wrap;
+        -webkit-box-pack: center;
+        justify-content: center;
+        margin: 1rem 0px;
+    }
+
+    .pagination_btn {
+        display: flex;
+        -webkit-box-pack: center;
+        justify-content: center;
+        -webkit-box-align: center;
+        align-items: center;
+        width: 3rem;
+        height: 3rem;
+        background: url(./assets/provision-rectangle-empty.png) center center / cover no-repeat, rgb(44, 31, 23);
+        background-position: center center;
+        margin: 0px 2px;
+    }
+
+    .pagination_btn_text {
+        color: rgb(226, 167, 62);
+        margin-bottom: 0px;
+        background-image: linear-gradient(to right, rgb(250, 223, 122), rgb(226, 167, 62));
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: none;
+        text-align: center;
+        font-family: gwent, sans-serif;
+        font-style: normal;
+        font-weight: 800;
+        font-size: 30px;
+        line-height: 1;
     }
 
 </style>

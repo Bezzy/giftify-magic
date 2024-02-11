@@ -10,13 +10,22 @@ function App() {
   if (global_init === false) {
     global_init = true;
 
-    fetch("http://127.0.0.1:9696").
+    fetch("https://api.magicthegathering.io/v1/cards").
     then(response => response.json()).
     then(function (data) {
-        let clone_data = data.map(obj => ({ ...obj }));
+        let d = data.cards;
+        let c = 0;
+        let df = d.filter(function(card) {
+            ++c;
+            if (card.imageUrl !== undefined) {
+                return card;
+            }
+        });
+
+        let clone_data = df.map(obj => ({ ...obj }));
       global_cards = clone_data;
 
-      let clone_global_cards = data.map(obj => ({ ...obj }));
+      let clone_global_cards = df.map(obj => ({ ...obj }));
       set_cards(clone_global_cards);
     });
 
@@ -53,17 +62,20 @@ function App() {
   }
 
 
-  function search_onchange(v) {
-      let clone_cards = cards.map(obj => ({ ...obj }));
-    if (v === "") {
-      set_cards(clone_cards);
-    }
+  function search_on_click() {
+      fetch("https://api.magicthegathering.io/v1/cards?name=" + search_val).
+      then(response => response.json()).
+      then(function (data) {
+          let d = data.cards;
+          let df = d.filter(function(card) {
+              if (card.imageUrl !== undefined) {
+                  return card;
+              }
+          });
 
-    if (global_cards.length > 0) {
-      set_cards(global_cards.filter(function(card) {
-        return card.name.toLowerCase().includes(v.toLowerCase());
-      }));
-    }
+          let filter = are_cards_selected(df, new_deck.cards);
+          set_cards(filter);
+      });
   }
 
   function NewDeckButton() {
@@ -184,6 +196,24 @@ function App() {
     );
   }
 
+  function are_cards_selected(set, data) {
+      console.log("set", set);
+      console.log("data", data);
+      for (let idx = 0; idx < data.length; idx++) {
+          console.log("ososo");
+          let id = data[idx].id;
+          let index = set.findIndex(function(obj) {
+              console.log(`${obj.id} === ${id}`, obj);
+              return obj.id === id;
+          });
+          console.log("index", index);
+          if (index != -1) {
+              set[index].is_selected = true;
+          }
+      }
+      return set;
+  }
+
   const [is_update_mode, set_is_update_mode] = React.useState(false);
   function update_mode(deck) {
       set_create_deck_mode(false);
@@ -194,22 +224,10 @@ function App() {
       fetch("http://127.0.0.1:9696/api/edit_deck?id=" + deck.id).
       then(response => response.json()).
       then(function (data) {
-          let clone_data = data.map(obj => ({ ...obj }));
           set_new_deck({name:deck.Name, cards:data});
-
-          console.log("data", data[0].id_crypt);
           let clone_cards = cards.map(obj => ({ ...obj }));
-          for (let idx = 0; idx < data.length; idx++) {
-              let id_crypt = data[idx].id_crypt;
-              let index = cards.findIndex(function(obj) {
-                  console.log(`${obj.id_crypt} === ${id_crypt}`, obj);
-                  return obj.id_crypt === id_crypt;
-              });
-              console.log("index", index);
-              clone_cards[index].is_selected = true;
-          }
-          set_cards(clone_cards);
-
+          let cards_selected = are_cards_selected(clone_cards, data);
+          set_cards(cards_selected);
       });
   }
 
@@ -238,7 +256,6 @@ function App() {
                       set_new_deck(clone_new_deck);
 
                       clone_cards[idx_card].is_selected = false;
-                      console.log("global_cards", global_cards);
                       set_cards(clone_cards);
                   }
               }));
@@ -248,7 +265,6 @@ function App() {
                   set_new_deck(clone_new_deck);
 
                   clone_cards[idx_card].is_selected = true;
-                  console.log("global_cards", global_cards);
                   set_cards(clone_cards);
               } else {
 
@@ -412,6 +428,61 @@ function App() {
       );
   }
 
+    const [pagination, set_pagination] = React.useState(1);
+    let page = 1;
+    function next_page() {
+        set_pagination(pagination + 1);
+        page = page + 1;
+        fetch("https://api.magicthegathering.io/v1/cards?page=" + (pagination + 1)).
+        then(response => response.json()).
+        then(function (data) {
+            let d = data.cards;
+            let df = d.filter(function(card) {
+                if (card.imageUrl !== undefined) {
+                    return card;
+                }
+            });
+            let filter = are_cards_selected(df, new_deck.cards);
+            set_cards(filter);
+        });
+    }
+
+    function before_page() {
+        set_pagination((pagination < 1 ? 1 : pagination - 1));
+        fetch("https://api.magicthegathering.io/v1/cards?page=" + (pagination - 1)).
+        then(response => response.json()).
+        then(function (data) {
+            let d = data.cards;
+            let df = d.filter(function(card) {
+                if (card.imageUrl !== undefined) {
+                    return card;
+                }
+            });
+
+            let filter = are_cards_selected(df, new_deck.cards);
+            set_cards(filter);
+        });
+    }
+
+    function Pagination() {
+      return (
+          <div className="">
+              <div className="pagination">
+                  <button onClick={() => before_page()} className="pagination_btn">
+                      <p className="pagination_btn_text">-</p>
+                  </button>
+                  <button onClick={() => next_page()} className="pagination_btn">
+                      <p className="pagination_btn_text">+</p>
+                  </button>
+              </div>
+          </div>
+      );
+    }
+
+    const [search_val, set_search_val] = React.useState("");
+
+
+
     return (
         <div>
             <Header/>
@@ -426,9 +497,8 @@ function App() {
                     <div className="dDCAKo">
                         <div className="crdnLx">
                             <div className="eTHfbE">
-                                <input onChange={(e) => search_onchange(e.target.value)} name="search_card"
-                                       className="nNDKL"/>
-                                <div className="juInEb"></div>
+                                <input onChange={(e) => set_search_val(e.target.value)} name="search_card" className="nNDKL"/>
+                                <div className="juInEb" onClick={(e) => search_on_click()}></div>
                             </div>
                             <div title="Reset filters"
                                  className="LibraryCardSearchInput__ResetButton-sc-1wdxocb-4 hzgKeb"></div>
@@ -479,6 +549,7 @@ function App() {
           </div>
 
         </div>
+        <Pagination />
       </div>
   );
 }
