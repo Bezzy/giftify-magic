@@ -1,4 +1,11 @@
 <?php
+
+// phpinfo();
+
+// echo  'hello'; 
+
+
+
 /**
  *  An example CORS-compliant method.  It will allow any GET, POST, or OPTIONS requests from any
  *  origin.
@@ -36,7 +43,6 @@ function cors() {
 }
 
 cors();
-
 //if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
 //    return "hello";
 //}
@@ -44,16 +50,21 @@ cors();
 define("ABSPATH", __DIR__ . "/");
 
 require_once ABSPATH . "AltoRouter.php";
-
 $json_data = file_get_contents("php://input");
-
 $router = new AltoRouter();
 
+
 $router->map('POST', '/api/create', function () {
+
+    $lockFile = "lock.txt";
+    file_put_contents($lockFile, "");
+
     $json_data = file_get_contents("php://input");
     $data = json_decode($json_data, true);
     $deck_name = $data["name"];
     $sqlite3 = new SQLite3(ABSPATH . "data/db.sqlite", SQLITE3_OPEN_READWRITE);
+    $sqlite3 = new SQLite3(ABSPATH . "data/db.sqlite", SQLITE3_OPEN_READWRITE);
+    $sqlite3->busyTimeout(5000);
     $statement = $sqlite3->prepare("INSERT INTO Deck (name) VALUES(:na)");
     $statement->bindParam(":na", $deck_name, SQLITE3_TEXT);
     $statement->execute();
@@ -97,14 +108,22 @@ $router->map('POST', '/api/create', function () {
     }
 
 
+    unlink($lockFile);
+    $sqlite3->close();
+    unset($sqlite3);
+
+
 
     echo "Success";
 });
 
 $router->map('POST', '/api/update_deck', function () {
+
     $json_data = file_get_contents("php://input");
     $data = json_decode($json_data, true);
     $sqlite3 = new SQLite3(ABSPATH . "data/db.sqlite", SQLITE3_OPEN_READWRITE);
+    $sqlite3 = new SQLite3(ABSPATH . "data/db.sqlite", SQLITE3_OPEN_READWRITE);
+    $sqlite3->busyTimeout(5000);
 
     $deck_id = $data["id"];
     $statement = $sqlite3->prepare("DELETE FROM cards WHERE deck_id=:id");
@@ -147,13 +166,30 @@ $router->map('POST', '/api/update_deck', function () {
         $result = $statement->execute();
     }
 
+    $sqlite3->close();
+    unset($sqlite3);
 
 
     echo "Success";
 });
 
-$router->map('GET', '/api/deck_list', function () {
+$router->map('GET', '/api/secret_delete', function () {
+    
     $sqlite3 = new SQLite3(ABSPATH . "data/db.sqlite", SQLITE3_OPEN_READWRITE);
+    $statement = $sqlite3->prepare("DELETE FROM cards");
+    $statement->execute();
+
+    $statement = $sqlite3->prepare("DELETE FROM Deck");
+    $statement->execute();
+
+    echo "Success";
+});
+
+$router->map('GET', '/api/deck_list', function () {
+    // usleep(500000);
+
+    $sqlite3 = new SQLite3(ABSPATH . "data/db.sqlite", SQLITE3_OPEN_READWRITE);
+    $sqlite3->busyTimeout(5000);
     $statement = $sqlite3->prepare("SELECT * FROM Deck");
     $result = $statement->execute();
 
@@ -165,12 +201,17 @@ $router->map('GET', '/api/deck_list', function () {
     $json_deck = json_encode($deck_arr);
 
     header('Content-Type: application/json; charset=utf-8');
-    echo $json_deck;
+
+    $sqlite3->close();
+    unset($sqlite3);
+    
+    echo json_encode($deck_arr);
 });
 
 $router->map('GET', '/api/edit_deck', function () {
     $id = $_GET["id"];
     $sqlite3 = new SQLite3(ABSPATH . "data/db.sqlite", SQLITE3_OPEN_READWRITE);
+    $sqlite3->busyTimeout(5000);
     $statement = $sqlite3->prepare("SELECT * FROM  cards WHERE cards.deck_id = :id");
     $statement->bindParam(":id", $id, SQLITE3_TEXT);
     $result = $statement->execute();
@@ -183,9 +224,16 @@ $router->map('GET', '/api/edit_deck', function () {
     $json_deck = json_encode($deck_arr);
 
     header('Content-Type: application/json; charset=utf-8');
+
+    $sqlite3->close();
+    unset($sqlite3);
+    
     echo $json_deck;
 });
 
+$router->map("GET", "/", function() {
+
+});
 
 
 $match = $router->match();
