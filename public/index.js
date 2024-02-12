@@ -54,45 +54,7 @@ function App() {
             });
     }
 
-    function card_hover(id) {
-        let card = document.getElementById(id);
-        let sound = document.getElementById("paper-collect-1");
-        sound.currentTime = 0;
-        sound.muted = false;
-        sound.play();
-        card.style.transform = "scale(1.2)";
-        card.style.zIndex = "99999";
-    }
 
-    function card_exit_hover(id) {
-        let card = document.getElementById(id);
-        card.style.transform = "scale(1)";
-        card.style.zIndex = "";
-    }
-
-    function create_new_deck() {
-        set_editing_mode(true);
-        set_create_deck_mode(true);
-        set_is_update_mode(false);
-
-        set_new_deck({ name: "Nouveau Deck", cards: [] });
-    }
-
-    function search_on_click() {
-        fetch("https://api.magicthegathering.io/v1/cards?name=" + search_val).
-            then(response => response.json()).
-            then(function (data) {
-                let d = data.cards;
-                let df = d.filter(function (card) {
-                    if (card.imageUrl !== undefined) {
-                        return card;
-                    }
-                });
-
-                let filter = are_cards_selected(df, new_deck.cards);
-                set_cards(filter);
-            });
-    }
 
     ////////////////////////////////////////////////////////////////////////////
     // Components
@@ -208,14 +170,6 @@ function App() {
         );
     }
 
-    function toggle_options() {
-        console.log("hello");
-        if (roll_options_toggle) {
-            set_roll_options_toggle(false);
-        } else {
-            set_roll_options_toggle(true);
-        }
-    }
 
     function Deck_Button() {
         return (
@@ -326,6 +280,73 @@ function App() {
         );
     }
 
+    function Pagination() {
+        return (
+            <div className="">
+                <div className="pagination">
+                    <button onClick={() => before_page()} className="pagination_btn">
+                        <p className="pagination_btn_text">-</p>
+                    </button>
+                    <button onClick={() => next_page()} className="pagination_btn">
+                        <p className="pagination_btn_text">+</p>
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    function Scrollable() {
+        return (
+            <div className="ScrollableContainer__TrackVertical-sc-123mqds-0 iNjlus">
+                <div className="ScrollableContainer__ThumbVertical-sc-123mqds-1 kqeGLj" style="height: 623px; transform: translateY(0px);"></div>
+            </div>
+        );
+    }
+
+     ////////////////////////////////////////////////////////////////////////////
+    // Features
+    //
+
+    function card_hover(id) {
+        let card = document.getElementById(id);
+        let sound = document.getElementById("paper-collect-1");
+        sound.currentTime = 0;
+        sound.muted = false;
+        sound.play();
+        card.style.transform = "scale(1.2)";
+        card.style.zIndex = "99999";
+    }
+
+    function card_exit_hover(id) {
+        let card = document.getElementById(id);
+        card.style.transform = "scale(1)";
+        card.style.zIndex = "";
+    }
+
+    function create_new_deck() {
+        set_editing_mode(true);
+        set_create_deck_mode(true);
+        set_is_update_mode(false);
+
+        set_new_deck({ name: "Nouveau Deck", cards: [] });
+    }
+
+    function search_on_click() {
+        fetch("https://api.magicthegathering.io/v1/cards?name=" + search_val).
+            then(response => response.json()).
+            then(function (data) {
+                let d = data.cards;
+                let df = d.filter(function (card) {
+                    if (card.imageUrl !== undefined) {
+                        return card;
+                    }
+                });
+
+                let filter = are_cards_selected(df, new_deck.cards);
+                set_cards(filter);
+            });
+    }
+
     function are_cards_selected(set, data) {
         console.log("set", set);
         console.log("data", data);
@@ -360,32 +381,14 @@ function App() {
             });
     }
 
-    function Pagination() {
-        return (
-            <div className="">
-                <div className="pagination">
-                    <button onClick={() => before_page()} className="pagination_btn">
-                        <p className="pagination_btn_text">-</p>
-                    </button>
-                    <button onClick={() => next_page()} className="pagination_btn">
-                        <p className="pagination_btn_text">+</p>
-                    </button>
-                </div>
-            </div>
-        );
+    function toggle_options() {
+        console.log("hello");
+        if (roll_options_toggle) {
+            set_roll_options_toggle(false);
+        } else {
+            set_roll_options_toggle(true);
+        }
     }
-
-    function Scrollable() {
-        return (
-            <div className="ScrollableContainer__TrackVertical-sc-123mqds-0 iNjlus">
-                <div className="ScrollableContainer__ThumbVertical-sc-123mqds-1 kqeGLj" style="height: 623px; transform: translateY(0px);"></div>
-            </div>
-        );
-    }
-
-     ////////////////////////////////////////////////////////////////////////////
-    // Features
-    //
 
     function calculate_mana_avg() {
         let cards_without_land = new_deck.cards.filter(function (card) {
