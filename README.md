@@ -6,84 +6,53 @@ Pour accéder à l'application rendez-vous simplement à cette adresse:
 
 # Frontend
 
-Le frontend se trouve dans le dossier ./public et est composé de deux fichiers.
-Le fichier index.html et le fichier index.js.
 
-La partie css est directement inclus dans le fichier index.html en inline.
+The frontend is located in the ./public directory and consists of two files: index.html and index.js.
 
-L'application utilise comme dépendence:
-- React
-- Tailwinds
-- Babel
+The CSS part is directly included in the index.html file inline.
 
-Les trois sont utilisés avec un CDN. L'arborescence du dossier est donc très
-simple. La raison est que je ne prévoyais pas de faire autant de modifications
-au projet.
+The application uses the following dependencies:
 
-L'application utilise React. Le choix d'utiliser React
-s'est fait naturellement pour gérer une application aussi réactive qu'un
-Deck Builder.
+React
+Tailwind CSS
+Babel
+All three are used with a CDN. The folder structure is therefore very simple. The reason is that I did not plan to make so many modifications to the project. So, I didn't bother setting up a development environment. In the end, that's what I should have done because I ended up setting up an entire server.
 
-Au début je voulais faire tout le rendu coté serveur en SSR (Server Side Rendering).
-Mais, ensuite j'ai préféré uen interface plus intéractive qui répond en live
-au changement du Backend. Ceci offre une expérience plus immersive mais à pour
-inconvénient de devoir structurer le backend et le frontend de façon à
-synchroniser les changements d'états.
+The application uses React. The choice to use React came naturally to manage an application as reactive as a Deck Builder.
 
-Globalement, le front est structuré ainsi.
+Initially, I wanted to do all the rendering on the server side with SSR (Server Side Rendering). But then, I preferred a more interactive interface that responds live to changes from the backend. This provides a more immersive experience but has the disadvantage of needing to structure the backend and frontend to synchronize state changes.
 
-- Une liste d'états globaux pour gérér de façon dynamique les différents
-états de l'interface. Est-ce-qu'on est en mode creating ou updating ?
-Le nombre de cartes dans le deck... Il n'y a pas de router. Tout changement
-d'interface se fait en checkant la valeur d'un global state. is_updating_mode,
-is_create_mode ... Ceci à pour l'avantage de controler l'interface à un niveau
-très précis mais à pour inconvénient de compliqué la logique. Pour gérer les
-états je n'utilise pas de state manager mais, si je devais utiliser une
-librairie cela serait zustand.
+Overall, the front end is structured as follows:
 
-- Une partie composant, qui défini les différentes éléments de l'interface.
+A list of global states to dynamically manage different interface states. Are we in creating or updating mode? The number of cards in the deck... There is no router. Any interface change is done by checking the value of a global state: is_updating_mode, is_create_mode... This has the advantage of controlling the interface at a very precise level but has the disadvantage of complicating the logic. To manage states, I don't use a state manager, but if I were to use a library, it would be Zustand.
 
-- Une partie API fetch, qui à pour but de fetch les deux api utilisés. Celle de
-magic et celle du backend. Le fetching des data se fait généralement par le
-triggering d'un événement ou d'un état de l'application. Les états
-de l'application définissent qu'elles données on va demander. Par exemple,
-quand on clique sur sauvegarder le deck, si on est en update_mode alors
-on va query /update_deck mais si on est en create_mode alors on va query
-/create_deck.
+A component part, which defines the different elements of the interface.
+
+An API fetch part, which aims to fetch the two APIs used: the Magic API and the backend API. Fetching data is generally done by triggering an event or a state of the application. The application states define which data we will request. For example, when we click on save the deck, if we are in update_mode, then we will query /update_deck, but if we are in create_mode, then we will query /create_deck
 
 
 
 # Backend
 
-La partie backend est très simple aussi. Elle utilise un système de route
-(Altorouter) pour gérer les différents accès de l'API et communique les data
-via json.
+The backend part is also very simple. It uses a routing system (Altorouter) to manage the different API accesses and communicates data via JSON.
 
-L'api est très primitif et est divisé comme suit.
+The API is very primitive and is divided as follows.
 
-- create: C'est ici qu'on va créer le deck en récupérant le json correspondant.
 
-- update_deck: Après avoir modifier le deck dans le front. Celui-ci renvoie un
-json avec le deck modifié.
-
-- deck_list: Fetch les decks et renvoie un json incluant les deck.
-
-- edit_deck: Renvoie les cartes d'un deck sous format json.
-
-- secret_delete: Rénitialise la db en supprimant toutes les entrées.
+| Api Action    | Description                       | Action Url         |
+|---------------|-----------------------------------|--------------------|
+| create        | Save the new deck in db           | /api/create        |
+| update_deck   | update the selected deck in db    | /api/update_deck   |
+| deck_list     | return a list of all deck from db | /api/deck_list     |
+| edit_deck     | return cards from deck            | /api/edit_deck     |
+| secret_delete | Delete everything from db         | /api/secret_delete |
 
 # DB
 
-J'utilise une base de donnée afin de faire persister les data de l'API magic.
 
-La base de donnée utilisé est SQLite3. Il y a deux tables qui sont importantes.
-La table cards et la table Deck. La table cards contient les cartes du jeux et
-ses attributs (mana, puissance...). Chaque cartes dans la table cards contient
-l'id du deck auquel elle appartient. C'est ce qui permet de faire la jointure
-entre le deck et ses cartes. Le deck lui contient juste le nom du deck et
-le nombre de cartes dans le deck.
+The database I use to persist Magic API data is SQLite3. There are two important tables: the "cards" table and the "deck" table. The "cards" table contains the game's cards and their attributes (mana, power...). Each card in the "cards" table contains the ID of the deck to which it belongs. This allows for the connection between the deck and its cards. The deck itself contains just the deck's name and the number of cards in the deck.
 
-La table cards
+The "cards" table
 
 | name | manaCost | cmc | type | text | power | toughness | imageUrl | flavor | id | id_deck | id_card |
 |------|----------|-----|------|-----:|-------|-----------|----------|--------|----|---------|---------|
@@ -100,7 +69,7 @@ La table Deck
 
 ## Common Features
 
-Ces fonctionalités sont persistants entre le view mode et le editing mode.
+These functionalities persist between the view mode and the editing mode.
 
 - Card List
 - Pagination
@@ -108,16 +77,14 @@ Ces fonctionalités sont persistants entre le view mode et le editing mode.
 
 ## View mode
 
-Cette configuration permet de parcourir l'ensemble des cartes mais ne permet
-pas de construire son deck. On peut utiliser la pagination pour parcourir
-les cartes. Ou utiliser la bar de recherche pour faire une recherche par nom.
 
-Quand le state editing_mode est a false alors on est en mode view mode par défaut.
+This configuration allows browsing through all the cards but does not enable building a deck. Pagination can be used to navigate through the cards. Alternatively, the search bar can be used to search by name.
+
+When the editing_mode state is false, we are in view mode by default.
 
 ## Editing Mode
 
-Il s'agit de la fonctionalité principal du deck builder. Elle regroupe plusieurs
-fonctionalités:
+This is the main functionality of the deck builder. It encompasses several features:
 
 - Add card
 - Change Deck Name
@@ -125,23 +92,22 @@ fonctionalités:
 - Mana Avg
 - Discard
 
-Ce mode à deux états. Le create_mode || update_mode. Selon leurs états,
-les fonctionalités du  editing mode auront des comportements différents.
 
-Par exemple, si
+This mode has two states: the create_mode or update_mode. Depending on their states, the functionalities of the editing mode will behave differently.
+
+For example, if
 
 ```javascript
 update_mode = true;
 ```
 
-alors le bouton sauvegarder va fetch
-
+In this case, the "save" button will fetch
 
 ```
 /api/update_deck
 
 ```
- plutot que
+ instead of
 
 ```
 /api/create
@@ -149,64 +115,89 @@ alors le bouton sauvegarder va fetch
 
 
 ## Add  Card
-
-Cette fonctionalité permet d'ajouter une carte dans un deck ou de la supprimer.
-On ne peut ajouter plus de 30 cartes dans le deck.
+This feature allows adding a card to a deck or removing it. You cannot add more than 30 cards to the deck.
 
 ## Change Deck Name
-
-Cette fonctionalité permet de changer le nom du deck.
+This feature allows changing the name of the deck.
 
 ## Save Deck
-
-Cette fonctionalité permet de sauvegarder les modifications du deck ou de créer
-un nouveau deck.
+This feature allows saving the modifications made to the deck or creating a new deck.
 
 ## Mana Avg
-
-Cette fonctionalité permet de calculé la moyenne des mana du deck tout en
-filtrant le deck pour exclure les cartes de types land.
+This feature calculates the average mana of the deck while filtering out land cards.
 
 ## Discard
-
-Cette fonctioanalité permet de renitialiser tous les états. Si les data n'ont
-pas été sauvegardé alors elles ne seront pas enregistrer.
+This feature resets all states. If the data has not been saved, it will not be recorded.
 
 # Common Features
-
-Ces fonctionalités sont persistants entre le view mode et le editing mode.
-
+These features persist between the view mode and the editing mode.
 - Card List
 - Pagination
 - Search
 
 ## Card List
+Lists the cards and visually indicates whether they belong to the deck or not.
 
-Permet de lister les cartes et de représenter visuellement si les cartes font
-parti du deck ou non.
 
 ## Pagination
+Allows navigation between different cards from the Magic API.
 
-Permet de naviguer entre les différentes cartes de l'API.
+## Search
+Enables searching by name in the Magic API.
 
-# Search
+# Components
+The interface is divided into several components to represent the different states of the application.
 
-Perment de faire une recherche par nom dans l'API magic.
+
+# Table of Components and Attributes:
+
+| Component        | Associated Features                    | Request Data                                              | Use State                         | Changed State                                                                   | Component Childs                  |
+|------------------|----------------------------------------|-----------------------------------------------------------|-----------------------------------|---------------------------------------------------------------------------------|-----------------------------------|
+| NewDeckButton    | Create New Deck                        | none                                                      | none                              | create_deck_mode create_mode is_update_mode new_deck                            | none                              |
+| DeckStats        | Calculate Avg Mana Count Cards in Deck | none                                                      | avg_cmc cards_number_deck         |                                                                                 | none                              |
+| BtnHeaderBack    | Discard Changes                        | api/deck_list                                             | none                              | editing_mode create_deck_mode is_update_mode cards roll_options_toggle new_deck | none                              |
+| SaveBtn          | Save Deck Discard Changes              | /api/create or /api/update_deck                           | none                              | Same As BtnHeaderBack                                                           | none                              |
+| Deck_Button      | Toggle Options                         | none                                                      | new_deck.name roll_options_toggle | roll_options_toggle                                                             | none                              |
+| Selected         | Selected Card                          | none                                                      | card.is_selected                  | none                                                                            | none                              |
+| Roll_Options     | Save Deck Name                         | none                                                      | none                              | new_deck                                                                        | none                              |
+| Card_Container   | none                                   | none                                                      | card.name                         | none                                                                            | none                              |
+| Deck_Editing_Bar | none                                   | none                                                      | roll_options_toggle card          | none                                                                            | DeckStats NewDeckButton Deck_List |
+| Deck_List        | none                                   | none                                                      | deck_list                         | none                                                                            | Deck_Button                       |
+| Pagination       | Pagination                             | /cards?page=(pagination + 1) /cards?page=(pagination - 1) | none                              | cards pagination                                                                | none                              |
 
 
-# Composants
+# Table of States
 
-L'interface est divisé en plusieurs composant permettant de représenter
-les différents états de l'application
+| State               | Type   | Description                                               |
+|---------------------|--------|-----------------------------------------------------------|
+| cards               | Json   | Used to hold all the cards from the current pagination    |
+| filtering_cards     | Json   | Used to hold filtering cards in context                   |
+| create_deck_mode    | Bool   | Used to set the application in creating mode              |
+| editing_mode        | Bool   | Used to set the application in editing mode               |
+| current_deck        | Json   | Hold the current deck in use                              |
+| new_deck            | Json   | Used to hold the state of the deck                        |
+| deck_list           | Json   | Used to hold the list of all decks in DB                  |
+| avg_cmc             | Number | Used to hold the state of the avg cmc of the current deck |
+| is_update_mode      | Bool   | Used to set the application in update mode                |
+| pagination          | Number | Used to hold the current pagination number                |
+| roll_options_toggle | Bool   | Used to toggle the options of the deck                    |
+| deck_name           | String | Used to hold the name of the deck                         |
+| search_val          | String | Used to hold the value of the search bar                  |
+| Cards_number_deck   | Number | Used to hold the number of cards in a deck                |
 
-## NewDeckButton
-## DeckStats
-## BtnHeaderBack
-## SaveBtn
-## Deck_Button
-## Selected
-## Roll_Options
-## Card_Container
-## Deck_Editing_Bar
-## Deck_List
-## Pagination
+
+# Note
+
+I focused on developing the functionalities rather than having the cleanest code.
+
+After this phase where I outline the features, I take the time to really think about how to structure my code. It's also in this phase that I deeply debug and make the code more robust.
+
+The code presented is therefore a prototype.
+
+##  Misc
+
+I always code a debugger within the scope of my mouse pointer. It's an essential tool for me.
+
+The second essential tool is a profiler. I always measure the speed of my code. But I conduct a thorough analysis when I see a bottleneck.
+
+For PHP, I use PHPStorm for debugging and profiling, and for JavaScript, I use Chrome's development tool.

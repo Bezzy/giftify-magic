@@ -1,22 +1,6 @@
 <?php
 
-// phpinfo();
 
-// echo  'hello'; 
-
-
-
-/**
- *  An example CORS-compliant method.  It will allow any GET, POST, or OPTIONS requests from any
- *  origin.
- *
- *  In a production environment, you probably want to be more restrictive, but this gives you
- *  the general idea of what is involved.  For the nitty-gritty low-down, read:
- *
- *  - https://developer.mozilla.org/en/HTTP_access_control
- *  - https://fetch.spec.whatwg.org/#http-cors-protocol
- *
- */
 function cors() {
 
     // Allow from any origin
@@ -43,9 +27,6 @@ function cors() {
 }
 
 cors();
-//if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
-//    return "hello";
-//}
 
 define("ABSPATH", __DIR__ . "/");
 
@@ -62,7 +43,6 @@ $router->map('POST', '/api/create', function () {
     $json_data = file_get_contents("php://input");
     $data = json_decode($json_data, true);
     $deck_name = $data["name"];
-    $sqlite3 = new SQLite3(ABSPATH . "data/db.sqlite", SQLITE3_OPEN_READWRITE);
     $sqlite3 = new SQLite3(ABSPATH . "data/db.sqlite", SQLITE3_OPEN_READWRITE);
     $sqlite3->busyTimeout(5000);
     $statement = $sqlite3->prepare("INSERT INTO Deck (name) VALUES(:na)");
@@ -121,7 +101,6 @@ $router->map('POST', '/api/update_deck', function () {
 
     $json_data = file_get_contents("php://input");
     $data = json_decode($json_data, true);
-    $sqlite3 = new SQLite3(ABSPATH . "data/db.sqlite", SQLITE3_OPEN_READWRITE);
     $sqlite3 = new SQLite3(ABSPATH . "data/db.sqlite", SQLITE3_OPEN_READWRITE);
     $sqlite3->busyTimeout(5000);
 
