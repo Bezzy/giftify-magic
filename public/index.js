@@ -110,28 +110,7 @@ function App() {
         );
     }
 
-    function discard_changes() {
-        let clone_global_cards = global_cards.map(obj => ({ ...obj }));
-        set_editing_mode(false);
-        set_create_deck_mode(false);
-        set_is_update_mode(false);
-        set_cards(clone_global_cards);
-        set_roll_options_toggle(false);
-        set_new_deck({ name: "Nouveau Deck", cards: [] });
 
-        fetch("http://195.15.206.94:9696/api/deck_list").
-            then(response => response.json()).
-            then(function (data) {
-                console.log("------------------------------------------------------------------------------------------------");
-                let clone_data = data.map(obj => ({ ...obj }));
-                let clone_deck_list = data.map(obj => ({ ...obj }));
-                set_deck_list(clone_deck_list);
-            });
-
-        /*
-        * TOOD(): Clean stuff.
-        * */
-    }
 
     function SaveBtn() {
         return (
@@ -306,6 +285,29 @@ function App() {
      ////////////////////////////////////////////////////////////////////////////
     // Features
     //
+    
+    function discard_changes() {
+        let clone_global_cards = global_cards.map(obj => ({ ...obj }));
+        set_editing_mode(false);
+        set_create_deck_mode(false);
+        set_is_update_mode(false);
+        set_cards(clone_global_cards);
+        set_roll_options_toggle(false);
+        set_new_deck({ name: "Nouveau Deck", cards: [] });
+
+        fetch("http://195.15.206.94:9696/api/deck_list").
+            then(response => response.json()).
+            then(function (data) {
+                console.log("------------------------------------------------------------------------------------------------");
+                let clone_data = data.map(obj => ({ ...obj }));
+                let clone_deck_list = data.map(obj => ({ ...obj }));
+                set_deck_list(clone_deck_list);
+            });
+
+        /*
+        * TOOD(): Clean stuff.
+        * */
+    }
 
     function card_hover(id) {
         let card = document.getElementById(id);
