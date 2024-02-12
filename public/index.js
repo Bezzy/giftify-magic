@@ -1,3 +1,5 @@
+//qui
+
 
 let audio = document.getElementById("paper-collect-1");
 audio.click();
@@ -77,12 +79,18 @@ function App() {
 
         calculate_mana_avg();
         count_cards_deck();
+        let check_box_url = ``;
+        if (cards_number_deck >= 20) {
+            check_box_url = "validation-true";
+        } else {
+            check_box_url = "validation-false";
+        }
 
         return (
             <div className="flex justify-evenly	w-full h-[5rem] relative pb-[0.5rem]">
                 <div title="You need at least 25 cards in a deck." className="flex items-center justify-center">
                     <div
-                        className="h-[2.1875rem] w-[1.875rem] relative bg-[url('./assets/scraps-icon.png')] bg-center bg-[length:auto_100%] bg-no-repeat before:content-[''] before:absolute before:bottom-[-1px] before:right-[-1px] before:w-[1.25rem] before:h-[1.375rem] before:bg-[length:100%_100%] before:bg-no-repeat before:bg-[url('./assets/validation-false.png')]"></div>
+                        className={`h-[2.1875rem] w-[1.875rem] relative bg-[url('./assets/scraps-icon.png')] bg-center bg-[length:auto_100%] bg-no-repeat before:content-[''] before:absolute before:bottom-[-1px] before:right-[-1px] before:w-[1.25rem] before:h-[1.375rem] before:bg-[length:100%_100%] before:bg-no-repeat before:bg-[url('./assets/${check_box_url}.png')]`}></div>
                     <div className="flex flex-col items-center justify-center">
                         <div className="text-white font-HalisGR text-[18px]">CARTES</div>
                         <div className="font-gwent text-[32px] leading-none">{cards_number_deck}</div>
@@ -90,7 +98,7 @@ function App() {
                 </div>
                 <div title="You need at least 25 cards in a deck." className="flex items-center justify-center">
                     <div
-                        className="h-[2.1875rem] w-[1.875rem] relative bg-[url('./assets/scraps-icon.png')] bg-center bg-[length:auto_100%] bg-no-repeat before:content-[''] before:absolute before:bottom-[-1px] before:right-[-1px] before:w-[1.25rem] before:h-[1.375rem] before:bg-[length:100%_100%] before:bg-no-repeat before:bg-[url('./assets/validation-false.png')]"></div>
+                        className={`h-[2.1875rem] w-[1.875rem] relative bg-[url('./assets/scraps-icon.png')] bg-center bg-[length:auto_100%] bg-no-repeat before:content-[''] before:absolute before:bottom-[-1px] before:right-[-1px] before:w-[1.25rem] before:h-[1.375rem] before:bg-[length:100%_100%] before:bg-no-repeat before:bg-[]`}></div>
                     <div className="flex flex-col items-center justify-center">
                         <div className="text-white font-HalisGR text-[18px]">MAN AVG</div>
                         <div className="font-gwent text-[32px] leading-none">{avg_cmc}</div>
@@ -105,7 +113,7 @@ function App() {
             <button onClick={() => discard_changes()} className="flex-[1_1_0px] flex items-center justify-start">
                 <div
                     className="flex bg-[url('./assets/back-icon.png')] bg-center bg-[length:100%_100%] bg-no-repeat w-[16px] h-[16px] mr-[8px]"></div>
-                <span className="font-gwent text-white text-[34px]">Back</span>
+                <span className="font-gwent text-white text-[34px]">Retour</span>
             </button>
         );
     }
@@ -160,8 +168,7 @@ function App() {
         );
     }
 
-    function Deck_Button2(props) {
-        console.log("DEEDDEED", props.props.deck);
+    function Deck_Button2(props) {        
         return (
             <li className="deckBtn" onClick={() => update_mode(props.props.deck)}>
                 <div className="deckBtn_slot">
@@ -194,8 +201,7 @@ function App() {
         );
     }
 
-    function Card_Container(name) {
-        console.log(name);
+    function Card_Container(name) {        
         return (
             <li className="cardContainer">
                 <div className="cardContainer_slot" tabIndex="0">
@@ -234,8 +240,7 @@ function App() {
     }
 
     function Deck_List() {
-
-        console.log(deck_list);
+        
 
 
         return (
@@ -285,7 +290,7 @@ function App() {
      ////////////////////////////////////////////////////////////////////////////
     // Features
     //
-    
+
     function discard_changes() {
         let clone_global_cards = global_cards.map(obj => ({ ...obj }));
         set_editing_mode(false);
@@ -294,11 +299,11 @@ function App() {
         set_cards(clone_global_cards);
         set_roll_options_toggle(false);
         set_new_deck({ name: "Nouveau Deck", cards: [] });
+        set_pagination(1);
 
         fetch("http://195.15.206.94:9696/api/deck_list").
             then(response => response.json()).
-            then(function (data) {
-                console.log("------------------------------------------------------------------------------------------------");
+            then(function (data) {                
                 let clone_data = data.map(obj => ({ ...obj }));
                 let clone_deck_list = data.map(obj => ({ ...obj }));
                 set_deck_list(clone_deck_list);
@@ -349,17 +354,12 @@ function App() {
             });
     }
 
-    function are_cards_selected(set, data) {
-        console.log("set", set);
-        console.log("data", data);
-        for (let idx = 0; idx < data.length; idx++) {
-            console.log("ososo");
+    function are_cards_selected(set, data) {                
+        for (let idx = 0; idx < data.length; idx++) {            
             let id = data[idx].id;
-            let index = set.findIndex(function (obj) {
-                console.log(`${obj.id} === ${id}`, obj);
+            let index = set.findIndex(function (obj) {                
                 return obj.id === id;
-            });
-            console.log("index", index);
+            });            
             if (index != -1) {
                 set[index].is_selected = true;
             }
@@ -383,8 +383,7 @@ function App() {
             });
     }
 
-    function toggle_options() {
-        console.log("hello");
+    function toggle_options() {        
         if (roll_options_toggle) {
             set_roll_options_toggle(false);
         } else {
@@ -393,21 +392,18 @@ function App() {
     }
 
     function calculate_mana_avg() {
-        let cards_without_land = new_deck.cards.filter(function (card) {
-            console.log("CARD calc", card);
+        let cards_without_land = new_deck.cards.filter(function (card) {            
             if (!card.type.includes("Land")) {
                 return card;
             }
         });
-
-        console.log("cards_without_land", cards_without_land);
+        
 
         let total_cmc = 0;
         for (let idx = 0; idx < cards_without_land.length; idx++) {
             total_cmc += cards_without_land[idx].cmc;
         }
-
-        console.log("total_cmc", total_cmc);
+        
 
         let avg_cmc = cards_without_land.length > 0 ? total_cmc / cards_without_land.length : 0;
 
@@ -416,8 +412,7 @@ function App() {
         set_avg_cmc(avg_cmc);
     }
 
-    function add_card_to_deck(cards, card, idx_card) {
-        console.log("----------------dddddddddddd-------------", card);
+    function add_card_to_deck(cards, card, idx_card) {        
         let clone_cards = cards.map(obj => ({ ...obj }));
 
 
@@ -458,8 +453,7 @@ function App() {
 
     let local_deck_name = "";
 
-    function save_deck_name(deck_name) {
-        console.log(local_deck_name)
+    function save_deck_name(deck_name) {        
         let clone_new_deck = { ...new_deck };
         clone_new_deck.name = deck_name;
         set_new_deck(clone_new_deck);
@@ -467,16 +461,18 @@ function App() {
     }
    
     function save_deck() {
-        console.log(new_deck);
-        if (create_deck_mode) {
+        if (cards_number_deck >= 20 && cards_number_deck <= 30) {
+            if (create_deck_mode) {
 
-            post_save_deck("http://195.15.206.94:9696/api/create", new_deck);
-        }
-        if (is_update_mode) {
-            post_save_deck("http://195.15.206.94:9696/api/update_deck", new_deck);
+                post_save_deck("http://195.15.206.94:9696/api/create", new_deck);
+            }
+            if (is_update_mode) {
+                post_save_deck("http://195.15.206.94:9696/api/update_deck", new_deck);
+            }
+    
+            discard_changes();
         }
 
-        discard_changes();
     }
 
     async function post_save_deck(url = "", data = {}) {
@@ -493,8 +489,7 @@ function App() {
         if (response.ok) {
             fetch("http://195.15.206.94:9696/api/deck_list").
                 then(response => response.json()).
-                then(function (data) {
-                    console.log("------------------------------------------------------------------------------------------------");
+                then(function (data) {                    
                     let clone_data = data.map(obj => ({ ...obj }));
                     let clone_deck_list = data.map(obj => ({ ...obj }));
                     set_deck_list(clone_deck_list);
@@ -504,7 +499,7 @@ function App() {
     }
     
     let page = 1;
-    function next_page() {
+    function next_page() {        
         set_pagination(pagination + 1);
         page = page + 1;
         fetch("https://api.magicthegathering.io/v1/cards?page=" + (pagination + 1)).
@@ -521,7 +516,7 @@ function App() {
             });
     }
 
-    function before_page() {
+    function before_page() {        
         set_pagination((pagination < 1 ? 1 : pagination - 1));
         fetch("https://api.magicthegathering.io/v1/cards?page=" + (pagination - 1)).
             then(response => response.json()).
