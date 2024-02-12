@@ -33,7 +33,7 @@ function App() {
       set_cards(clone_global_cards);
     });
 
-      fetch("http://192.15.206.94:9696/api/deck_list").
+      fetch("http://127.0.0.1:9696/api/deck_list").
       then(response => response.json()).
       then(function (data) {
           let clone_data = data.map(obj => ({ ...obj }));
@@ -142,7 +142,7 @@ function App() {
     set_roll_options_toggle(false);
     set_new_deck({name: "Nouveau Deck", cards: []});
 
-      fetch("http://192.15.206.94:9696/api/deck_list").
+      fetch("http://127.0.0.1:9696/api/deck_list").
       then(response => response.json()).
       then(function (data) {
           console.log("------------------------------------------------------------------------------------------------");
@@ -237,7 +237,7 @@ function App() {
       set_editing_mode(true);
       set_current_deck(deck);
 
-      fetch("http://192.15.206.94:9696/api/edit_deck?id=" + deck.id).
+      fetch("http://127.0.0.1:9696/api/edit_deck?id=" + deck.id).
       then(response => response.json()).
       then(function (data) {
           set_new_deck({name:deck.Name, cards:data, id:deck.id});
@@ -408,10 +408,10 @@ function App() {
   function save_deck() {
       console.log(new_deck);
       if (create_deck_mode) {
-          post_save_deck("http://192.15.206.94:9696/api/create", new_deck);
+          post_save_deck("http://127.0.0.1:9696/api/create", new_deck);
       }
       if (is_update_mode) {
-          post_save_deck("http://192.15.206.94:9696/api/update_deck", new_deck);
+          post_save_deck("http://127.0.0.1:9696/api/update_deck", new_deck);
       }
 
       discard_changes();
