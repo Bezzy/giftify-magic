@@ -100,7 +100,11 @@ La table Deck
 
 ## Common Features
 
-Ces fonctionalités sont persistants entre le view mode et le editing mode
+Ces fonctionalités sont persistants entre le view mode et le editing mode.
+
+- Card List
+- Pagination
+- Search
 
 ## View mode
 
@@ -115,11 +119,11 @@ Quand le state editing_mode est a false alors on est en mode view mode par défa
 Il s'agit de la fonctionalité principal du deck builder. Elle regroupe plusieurs
 fonctionalités:
 
-- Selected card
+- Add card
 - Change Deck Name
 - Save Deck
 - Mana Avg
-- Cards Number
+- Discard
 
 Ce mode à deux états. Le create_mode || update_mode. Selon leurs états,
 les fonctionalités du  editing mode auront des comportements différents.
@@ -127,9 +131,7 @@ les fonctionalités du  editing mode auront des comportements différents.
 Par exemple, si
 
 ```javascript
-
 update_mode = true;
-
 ```
 
 alors le bouton sauvegarder va fetch
@@ -146,6 +148,65 @@ alors le bouton sauvegarder va fetch
 ```
 
 
-## Selected Card
+## Add  Card
 
-Cette fonctionalité permet 
+Cette fonctionalité permet d'ajouter une carte dans un deck ou de la supprimer.
+On ne peut ajouter plus de 30 cartes dans le deck.
+
+## Change Deck Name
+
+Cette fonctionalité permet de changer le nom du deck.
+
+## Save Deck
+
+Cette fonctionalité permet de sauvegarder les modifications du deck ou de créer
+un nouveau deck.
+
+## Mana Avg
+
+Cette fonctionalité permet de calculé la moyenne des mana du deck tout en
+filtrant le deck pour exclure les cartes de types land.
+
+## Discard
+
+Cette fonctioanalité permet de renitialiser tous les états. Si les data n'ont
+pas été sauvegardé alors elles ne seront pas enregistrer.
+
+# Common Features
+
+Ces fonctionalités sont persistants entre le view mode et le editing mode.
+
+- Card List
+- Pagination
+- Search
+
+## Card List
+
+Permet de lister les cartes et de représenter visuellement si les cartes font
+parti du deck ou non.
+
+## Pagination
+
+Permet de naviguer entre les différentes cartes de l'API.
+
+# Search
+
+Perment de faire une recherche par nom dans l'API magic.
+
+
+# Composants
+
+L'interface est divisé en plusieurs composant permettant de représenter
+les différents états de l'application
+
+## NewDeckButton
+## DeckStats
+## BtnHeaderBack
+## SaveBtn
+## Deck_Button
+## Selected
+## Roll_Options
+## Card_Container
+## Deck_Editing_Bar
+## Deck_List
+## Pagination
