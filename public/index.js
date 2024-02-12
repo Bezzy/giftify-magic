@@ -179,6 +179,7 @@ function App() {
     }
 
     function Selected(props) {
+        
         return (
             <div className={cards[props.props.idx].is_selected ? "cardSelected" : ""}></div>
         );
@@ -412,7 +413,9 @@ function App() {
         set_avg_cmc(avg_cmc);
     }
 
-    function add_card_to_deck(cards, card, idx_card) {        
+    function add_card_to_deck(cards, card, idx_card) {  
+        console.log(new_deck);
+        console.log(card);  
         let clone_cards = cards.map(obj => ({ ...obj }));
 
 

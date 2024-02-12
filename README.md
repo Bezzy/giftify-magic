@@ -1,8 +1,12 @@
-Pour accéder à l'application rendez-vous simplement à cette adresse:
+To access the application, simply go to this address:
 
 ```
 195.15.206.94
 ```
+
+Here is a link that shows the interaction with the application and its various features.
+
+[Lien de la vidéo](https://drive.google.com/file/d/1O2RPyVrVJh1-6WnsibLhVXc4EByQ4rEd/view?usp=sharing)
 
 # Frontend
 
